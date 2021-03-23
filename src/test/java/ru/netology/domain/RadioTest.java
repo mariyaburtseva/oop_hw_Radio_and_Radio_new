@@ -1,99 +1,114 @@
 package ru.netology.domain;
 
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class RadioTest {
-    Radio radio = new Radio();
 
-    @ParameterizedTest
-    @CsvSource(
-            value = {
-                    "-1; 0",
-                    "5; 5",
-                    "10; 0"
-            }
-            , delimiter = ';'
-    )
-    void setCurrentStationTest(int start, int expected) {
-        radio.setCurrentRadioStation(start);
-        assertEquals(expected, radio.getCurrentRadioStationNumber());
+    @Test
+    public void buildAndInstall() {
+        Radio radio = new Radio();
+        radio.getCurrentRadioStationNumber();
     }
 
-    @ParameterizedTest
-    @CsvSource(
-            value = {
-                    "0; 1",
-                    "9; 0"
-            }
-            , delimiter = ';'
-    )
-    void setNextRadioStationNumber(int start, int expected) {
-        radio.setCurrentRadioStation(start);
-        radio.setNextRadioStationNumber();
-        assertEquals(expected, radio.getCurrentRadioStationNumber());
+    @Test
+    public void setCurrentStationTest() {
+        Radio radio = new Radio(1, 10, 25);
+        radio.setCurrentRadioStation(1);
+        int actual = radio.getCurrentRadioStationNumber();
+        assertEquals(1, actual);
     }
 
-
-    @ParameterizedTest
-    @CsvSource(
-            value = {
-                    "0; 9",
-                    "8; 7",
-            }
-            , delimiter = ';'
-    )
-    void setPrevRadioStationNumber(int start, int expected) {
-        radio.setCurrentRadioStation(start);
-        radio.setPrevRadioStationNumber();
-        assertEquals(expected, radio.getCurrentRadioStationNumber());
+    @Test
+    public void setCurrentStationTestLessPermissible() {
+        Radio radio = new Radio(10, 10, 25);
+        radio.setCurrentRadioStation(-1);
+        int actual = radio.getCurrentRadioStationNumber();
+        assertEquals(10, actual);
     }
 
+    @Test
+    public void setCurrentStationTestMoreThatAllowed() {
+        Radio radio = new Radio(10, 10, 25);
+        radio.setCurrentRadioStation(11);
+        int actual = radio.getCurrentRadioStationNumber();
+        assertEquals(10, actual);
+    }
+
+    @Test //номер станции не должен быть больше максимального
+    public void nextRadioStationNumber() {
+        Radio radio = new Radio(0, 10, 25);
+        radio.setNextRadioStationNumber(1);
+        int actual = radio.getCurrentRadioStationNumber();
+        assertEquals(1, actual);
+    }
+
+    @Test //Переключение на плюс одну в границах диапазона
+    public void theNextStationIsWithinAcceptableLimits() {
+        Radio radio = new Radio(10, 10, 25);
+        radio.setNextRadioStationNumber(11);
+        int actual = radio.getCurrentRadioStationNumber();
+        assertEquals(0, actual);
+    }
+
+    @Test // станция не должна быть меньше минимальной
+    public void setPrevRadioStationNumber() {
+        Radio radio = new Radio(0, 10, 25);
+        radio.setPrevRadioStationNumber(10);
+        int actual = radio.getCurrentRadioStationNumber();
+        assertEquals(10, actual);
+    }
+
+    @Test // Переключение на минус одну в границах диапазона
+    public void previousStationWithinAcceptableRange() {
+        Radio radio = new Radio(8, 10, 25);
+        radio.setPrevRadioStationNumber(7);
+        int actual = radio.getCurrentRadioStationNumber();
+        assertEquals(7, actual);
+    }
 
     //ГРОМКОСТЬ:
-    @ParameterizedTest
-    @CsvSource(
-            value = {
-                    "-1; 5",
-                    "6; 6",
-                    "11; 5"
-            }
-            , delimiter = ';'
-    )
-    void currentSoundVolume(int start, int expected) {
-        radio.setCurrentSoundVolume(start);
-        assertEquals(expected, radio.getCurrentSoundVolume());
+    @Test
+    public void currentSoundVolume() {
+        Radio radio = new Radio(5, 10, 51);
+        radio.setCurrentSoundVolume(51);
+        int actual = radio.getCurrentSoundVolume();
+        assertEquals(51, actual);
     }
 
-    @ParameterizedTest
-    @CsvSource(
-            value = {
-                    "0; 1",
-                    "10; 10"
-            }
-            , delimiter = ';'
-    )
-    void plusSoundVolume(int start, int expected) {
-        radio.setCurrentSoundVolume(start);
+    @Test
+    public void plusSoundVolume() {
+        Radio radio = new Radio(5, 10, 100);
         radio.plusSoundVolume();
-        assertEquals(expected, radio.getCurrentSoundVolume());
+        radio.setCurrentSoundVolume(101);
+        int actual = radio.getCurrentSoundVolume();
+        assertEquals(100, actual);
     }
 
+    @Test
+    public void inTheRangePlusSoundVolume() {
+        Radio radio = new Radio(5, 10, 67);
+        radio.plusSoundVolume();
+        radio.setCurrentSoundVolume(68);
+        int actual = radio.getCurrentSoundVolume();
+        assertEquals(68, actual);
+    }
 
-    @ParameterizedTest
-    @CsvSource(
-            value = {
-                    "0; 0",
-                    "10; 9"
-            }
-            , delimiter = ';'
-    )
-    void minusSoundVolume(int start, int expected) {
-        radio.setCurrentSoundVolume(start);
+    @Test
+    public void minusSoundVolume() {
+        Radio radio = new Radio(5, 10, 0);
         radio.minusSoundVolume();
-        assertEquals(expected, radio.getCurrentSoundVolume());
+        radio.setCurrentSoundVolume(-1);
+        int actual = radio.getCurrentSoundVolume();
+        assertEquals(0, actual);
+    }
+
+    @Test
+    public void inTheRangeMinusSoundVolume() {
+        Radio radio = new Radio(5, 10, 22);
+        radio.minusSoundVolume();
+        radio.setCurrentSoundVolume(21);
+        int actual = radio.getCurrentSoundVolume();
+        assertEquals(21, actual);
     }
 }
-
-
